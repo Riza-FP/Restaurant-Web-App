@@ -1,0 +1,57 @@
+.container {
+  padding: 2rem;
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.orderItem {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+}
+
+.orderId {
+  font-weight: bold;
+}
+
+.timestamp {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.clearButton {
+  margin-top: 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.addForm input {
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.addForm button {
+  padding: 5px 10px;
+}
+
+.deleteButton {
+  margin-left: 10px;
+  background: transparent;
+  color: red;
+  border: none;
+  cursor: pointer;
+}
