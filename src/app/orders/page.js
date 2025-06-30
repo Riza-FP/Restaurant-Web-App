@@ -1,16 +1,26 @@
 'use client';
 
-
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './Orders.module.css';
 
 export default function OrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
 
-  // Fetch orders and menu items
+  // 🔐 Redirect to login if not logged in
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (!isLoggedIn) {
+      localStorage.setItem('redirectAfterLogin', '/orders');
+      router.push('/login');
+    }
+  }, [router]);
+
+  // 🚀 Fetch orders and products
   useEffect(() => {
     fetch('/api/orders')
       .then(res => res.json())
@@ -21,25 +31,21 @@ export default function OrdersPage() {
       .then(data => setProducts(data));
   }, []);
 
-  // Clear all orders
+  const refreshProducts = () => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => setProducts(data));
+  };
+
   const clearOrders = async () => {
-    if (confirm("Are you sure you want to delete all orders?")) {
+    if (confirm('Are you sure you want to delete all orders?')) {
       await fetch('/api/orders', { method: 'DELETE' });
       setOrders([]);
     }
   };
 
-  // Delete one order
-  const deleteOrder = async (id) => {
-    if (confirm("Delete this order?")) {
-      await fetch(`/api/orders/${id}`, { method: 'DELETE' });
-      setOrders(orders.filter(o => o.id !== id));
-    }
-  };
-
-  // Add new menu item
   const addItem = async () => {
-    if (!name || !price) return alert("Please fill out both fields.");
+    if (!name || !price) return alert('Please fill out both fields.');
     await fetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -50,23 +56,35 @@ export default function OrdersPage() {
     refreshProducts();
   };
 
-  // Delete a menu item
   const deleteItem = async (id) => {
-    if (confirm("Delete this item?")) {
+    if (confirm('Delete this item?')) {
       await fetch(`/api/products/${id}`, { method: 'DELETE' });
       refreshProducts();
     }
   };
 
-  // Refresh menu items
-  const refreshProducts = () => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => setProducts(data));
+  const updateItemPrice = async (id, newPrice) => {
+    await fetch(`/api/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ price: Number(newPrice) }),
+    });
+    refreshProducts();
   };
+
 
   return (
     <div className={styles.container}>
+      <button
+      onClick={() => {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('redirectAfterLogin');
+        router.push('/login');
+      }}
+      className={styles.logoutButton}
+    >
+      🚪 Logout
+    </button>
       <h1 className={styles.title}>👨‍💼 Admin Panel – Orders</h1>
 
       {orders.length === 0 ? (
@@ -76,10 +94,10 @@ export default function OrdersPage() {
           {orders.map(order => (
             <li key={order.id} className={styles.orderItem}>
               <div className={styles.orderId}>Order #{order.id}</div>
-              <div className={styles.timestamp}>Placed at {new Date(order.created_at).toLocaleString()}</div>
+              <div className={styles.timestamp}>Placed at {order.created_at}</div>
               <p>Items:</p>
               <ul>
-                {JSON.parse(order.items).map((item, i) => (
+                {(Array.isArray(order.items) ? order.items : JSON.parse(order.items)).map((item, i) => (
                   <li key={i}>
                     {item.name} x {item.quantity} — ${item.price * item.quantity}
                   </li>
@@ -87,16 +105,10 @@ export default function OrdersPage() {
               </ul>
               <p>
                 <strong>Total:</strong> $
-                {JSON.parse(order.items)
+                {(Array.isArray(order.items) ? order.items : JSON.parse(order.items))
                   .reduce((sum, item) => sum + item.price * item.quantity, 0)
                   .toFixed(2)}
               </p>
-              <button
-                onClick={() => deleteOrder(order.id)}
-                className={styles.deleteButton}
-              >
-                Delete Order
-              </button>
             </li>
           ))}
         </ul>
@@ -129,7 +141,21 @@ export default function OrdersPage() {
       <ul>
         {products.map(prod => (
           <li key={prod.id}>
-            {prod.name} - ${prod.price.toFixed(2)}
+            {prod.name} – $
+            <input
+              type="number"
+              value={prod.price}
+              onChange={(e) => {
+                const newPrice = e.target.value;
+                setProducts(products.map(p =>
+                  p.id === prod.id ? { ...p, price: newPrice } : p
+                ));
+              }}
+              style={{ width: '80px', marginLeft: '8px', marginRight: '8px' }}
+            />
+            <button onClick={() => updateItemPrice(prod.id, prod.price)}>
+              Update
+            </button>
             <button
               onClick={() => deleteItem(prod.id)}
               className={styles.deleteButton}

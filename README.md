@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍽️ Restaurant Web App (Next.js + PostgreSQL + Docker)
 
-## Getting Started
+This is a full-stack restaurant management web app with login authentication, menu and order management, and PostgreSQL as the database — all running on top of **Next.js App Router**.
 
-First, run the development server:
+---
+
+## 🚀 Features
+
+- 🔐 **Admin Login System**
+  - User data stored securely in PostgreSQL
+  - Redirects to protected pages only after login
+
+- 🧾 **Menu Management**
+  - Add, edit, delete food items
+  - Stored in PostgreSQL, editable via dashboard
+
+- 🛒 **Order Tracking**
+  - Displays orders with item breakdown and timestamps
+  - Clear all orders with one click
+
+- ✅ **Access Control**
+  - Redirects unauthorized access from `/orders` to `/login`
+  - Remembers redirect path after login
+
+- 🐳 **Dockerized PostgreSQL**
+  - PostgreSQL runs in Docker using `docker-compose`
+  - Data persists in local volume
+
+---
+
+## 📂 Tech Stack
+
+- **Frontend:** Next.js 14 (App Router)
+- **Backend:** Node.js API Routes via Next.js
+- **Database:** PostgreSQL in Docker
+- **Styling:** CSS Modules
+- **Auth:** LocalStorage-based login (demo mode)
+
+---
+
+## 🧑‍💻 How to Run Locally
+
+### 1. 📦 Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. 🐳 Start PostgreSQL in Docker
+
+```bash
+docker compose up -d
+```
+
+This spins up PostgreSQL with:
+- `DB name`: `restaurantdb`
+- `User`: `myuser`
+- `Password`: `mypassword`
+
+> See `docker-compose.yml` for details.
+
+### 3. 🌐 Start the Dev Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then visit:  
+👉 `http://localhost:3000/login`
+For Admin Access and Orders Page
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+👉 `http://localhost:3000/`
+To Menu Page
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🔐 Default Admin Login
 
-To learn more about Next.js, take a look at the following resources:
+| Email               | Password   |
+|---------------------|------------|
+| `riza@example.com`  | `rizafp12` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure (Important Files)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+restaurant-web/
+├── app/
+│   ├── login/
+│   ├── menu/
+│   ├── orders/
+│   └── api/
+│       ├── login/
+│       ├── products/
+│       └── orders/
+├── lib/db.js        # PostgreSQL connection
+├── docker-compose.yml
+├── package.json
+├── .gitignore
+└── README.md
+```

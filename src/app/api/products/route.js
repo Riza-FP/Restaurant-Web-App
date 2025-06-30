@@ -1,34 +1,17 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import pool from '../../../../lib/db';
 
-// GET all products
 export async function GET() {
-  const db = await open({
-    filename: 'restaurant.db',
-    driver: sqlite3.Database,
-  });
-
-  const products = await db.all('SELECT * FROM product');
-  await db.close();
-
-  return new Response(JSON.stringify(products), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const result = await pool.query('SELECT * FROM product');
+  return Response.json(result.rows);
 }
 
-// POST a new product
 export async function POST(request) {
   const { name, price } = await request.json();
 
-  const db = await open({
-    filename: 'restaurant.db',
-    driver: sqlite3.Database,
-  });
+  await pool.query(
+    'INSERT INTO product (name, price) VALUES ($1, $2)',
+    [name, price]
+  );
 
-  await db.run('INSERT INTO product (name, price) VALUES (?, ?)', [name, price]);
-  await db.close();
-
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return Response.json({ success: true });
 }

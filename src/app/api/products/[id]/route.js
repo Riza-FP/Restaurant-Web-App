@@ -1,16 +1,9 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import pool from '@/lib/db';
 
-export async function DELETE(request, { params }) {
-  const db = await open({
-    filename: 'restaurant.db',
-    driver: sqlite3.Database,
-  });
+export async function DELETE(_, { params }) {
+  const { id } = params;
 
-  await db.run('DELETE FROM product WHERE id = ?', [params.id]);
-  await db.close();
+  await pool.query('DELETE FROM product WHERE id = $1', [id]);
 
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return Response.json({ success: true });
 }

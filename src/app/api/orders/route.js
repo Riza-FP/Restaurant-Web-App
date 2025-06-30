@@ -1,25 +1,21 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import pool from '../../../../lib/db';
 
-export async function POST(req) {
-  const body = await req.json();
-  const db = await open({ filename: 'restaurant.db', driver: sqlite3.Database });
-  const result = await db.run('INSERT INTO orders (items) VALUES (?)', JSON.stringify(body.items));
-  await db.close();
-  return new Response(JSON.stringify({ status: 'success', id: result.lastID }));
+export async function POST(request) {
+  const { items } = await request.json();
+  await pool.query('INSERT INTO orders (items) VALUES ($1)', [JSON.stringify(items)]);
+  return Response.json({ success: true });
 }
 
-
 export async function GET() {
-  const db = await open({ filename: 'restaurant.db', driver: sqlite3.Database });
-  const orders = await db.all('SELECT * FROM orders ORDER BY created_at DESC');
-  await db.close();
-  return new Response(JSON.stringify(orders));
+  const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+  const orders = result.rows.map(order => ({
+  ...order,
+  items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items,
+}));
+  return Response.json(result.rows);
 }
 
 export async function DELETE() {
-  const db = await open({ filename: 'restaurant.db', driver: sqlite3.Database });
-  await db.run('DELETE FROM orders');
-  await db.close();
-  return new Response(JSON.stringify({ success: true }));
+  await pool.query('DELETE FROM orders');
+  return Response.json({ success: true });
 }

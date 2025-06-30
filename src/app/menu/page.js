@@ -58,7 +58,7 @@ export default function MenuPage() {
           {products.map(prod => (
             <tr key={prod.id}>
               <td>{prod.name}</td>
-              <td>${prod.price.toFixed(2)}</td>
+              <td>${Number(prod.price).toFixed(2)}</td>
               <td>
                 <button onClick={() => addToCart(prod)} className={styles.addButton}>
                 Add
