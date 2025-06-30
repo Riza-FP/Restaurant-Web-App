@@ -141,21 +141,7 @@ export default function OrdersPage() {
       <ul>
         {products.map(prod => (
           <li key={prod.id}>
-            {prod.name} – $
-            <input
-              type="number"
-              value={prod.price}
-              onChange={(e) => {
-                const newPrice = e.target.value;
-                setProducts(products.map(p =>
-                  p.id === prod.id ? { ...p, price: newPrice } : p
-                ));
-              }}
-              style={{ width: '80px', marginLeft: '8px', marginRight: '8px' }}
-            />
-            <button onClick={() => updateItemPrice(prod.id, prod.price)}>
-              Update
-            </button>
+            {prod.name} – ${Number(prod.price).toFixed(2)}
             <button
               onClick={() => deleteItem(prod.id)}
               className={styles.deleteButton}
